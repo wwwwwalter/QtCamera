@@ -19,6 +19,7 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QImage>
+#include <QComboBox>
 
 class MainWindow : public QMainWindow
 {
@@ -31,8 +32,18 @@ public:
 
 
 private:
-    QMenu *menu;
-    QActionGroup *videoDevicesGroup = nullptr;
+
+    //control elements
+    QLabel *labelCameraDevices;
+    QComboBox *comboBoxCameraDevices;
+    QLabel *labelAudioInputDevices;
+    QComboBox *comboBoxAudioInputDevices;
+    QLabel *labelAudioOutputDevcies;
+    QComboBox *comboBoxAudioOutputDevcies;
+
+
+
+    //media elements
     QPushButton *startRecordButton;
     QPushButton *stopRecordButton;
     QPushButton *pauseRecordButton;
@@ -87,8 +98,13 @@ public:
     void DisplayViewfinder();
     void ProcessCapturedImage(int requestId,const QImage &img);
     void ReadyForCapture(bool ready);
-    void UpdateCameras();
     void SetCamera(const QCameraDevice &cameraDevice);
+
+    //update devices
+    void UpdateAudioInputDevices();
+    void UpdateAudioOutputDevices();
+    void UpdateVideoInputDevices();
+    void UpdataCameraDevices();
 
 
 

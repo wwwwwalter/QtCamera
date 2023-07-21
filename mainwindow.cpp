@@ -2,31 +2,60 @@
 
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QMenuBar>
 #include <QAction>
 #include <QTimer>
 #include <QStatusBar>
 #include <QDir>
 #include <QMessageBox>
+#include <QComboBox>
+#include <QAudioDevice>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    resize(800,450);
-    menu = menuBar()->addMenu(tr("Devices"));
-    videoDevicesGroup = new QActionGroup(this);
-    videoDevicesGroup->setExclusive(true);
-    UpdateCameras();
+    setWindowState(Qt::WindowMaximized);
 
 
-
+    //main widget
     QWidget *w = new QWidget;
     setCentralWidget(w);
 
-    QVBoxLayout *vboxlayout = new QVBoxLayout;
-    w->setLayout(vboxlayout);
+    QHBoxLayout *hboxlayout_main= new QHBoxLayout;
+    QVBoxLayout *vboxlayout_media = new QVBoxLayout;
+    QVBoxLayout *vboxlayout_control = new QVBoxLayout;
+    QGridLayout *gradlayout_control = new QGridLayout;
+    vboxlayout_control->addLayout(gradlayout_control);
+    vboxlayout_control->addStretch(0);
+    hboxlayout_main->addLayout(vboxlayout_media,3);
+    hboxlayout_main->addLayout(vboxlayout_control,1);
+    w->setLayout(hboxlayout_main);
+
+    //control layout
+    labelCameraDevices = new QLabel(tr("cameras devices:"));
+    comboBoxCameraDevices = new QComboBox;
+    labelAudioInputDevices = new QLabel(tr("audio inputs:"));
+    comboBoxAudioInputDevices = new QComboBox;
+    labelAudioOutputDevcies = new QLabel("audio outputs:");
+    comboBoxAudioOutputDevcies = new QComboBox;
+
+    gradlayout_control->addWidget(labelAudioInputDevices,0,0);
+    gradlayout_control->addWidget(comboBoxAudioInputDevices,0,1);
+    gradlayout_control->addWidget(labelAudioOutputDevcies,1,0);
+    gradlayout_control->addWidget(comboBoxAudioOutputDevcies,1,1);
+    gradlayout_control->addWidget(labelCameraDevices,2,0);
+    gradlayout_control->addWidget(comboBoxCameraDevices,2,1);
+
+    UpdateAudioInputDevices();
+    UpdateAudioOutputDevices();
+    UpdateVideoInputDevices();
 
 
+
+
+    //media layout
     videoWidget = new QVideoWidget;
     lastImage = new QLabel;
     stackedWidget = new QStackedWidget;
@@ -44,8 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     hboxlayout->addWidget(pauseRecordButton);
     hboxlayout->addWidget(captureButton);
     hboxlayout->addStretch();
-    vboxlayout->addWidget(stackedWidget);
-    vboxlayout->addLayout(hboxlayout);
+    vboxlayout_media->addWidget(stackedWidget);
+    vboxlayout_media->addLayout(hboxlayout);
 
     //output
     session = new QMediaCaptureSession(this);
@@ -68,8 +97,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //camera
-    connect(mediaDevices,&QMediaDevices::videoInputsChanged,this,&MainWindow::UpdateCameras);
-    connect(videoDevicesGroup,&QActionGroup::triggered,this,&MainWindow::setCamere_action);
+
 
     //capture
     ReadyForCapture(imageCapture->isReadyForCapture());
@@ -195,25 +223,8 @@ void MainWindow::ReadyForCapture(bool ready)
     captureButton->setEnabled(ready);
 }
 
-void MainWindow::UpdateCameras()
-{
-    menu->clear();
-    QList<QCameraDevice> availableCameras = QMediaDevices::videoInputs();
-    for(QCameraDevice &cameraDevice:availableCameras){
-        QAction *action = new QAction(cameraDevice.description(),videoDevicesGroup);
-        action->setCheckable(true);
-        action->setData(QVariant::fromValue(cameraDevice));
-        if(cameraDevice == QMediaDevices::defaultVideoInput()){
-            action->setChecked(true);
-        }
-        menu->addAction(action);
-    }
-}
-
 void MainWindow::SetCamera(const QCameraDevice &cameraDevice)
 {
-    qDebug()<<cameraDevice;
-
     if(cameraDevice.isNull()){
         qDebug()<<"cameraDevice is Null";
         return;
@@ -227,4 +238,28 @@ void MainWindow::SetCamera(const QCameraDevice &cameraDevice)
     camera->start();
 
 
+}
+
+void MainWindow::UpdateAudioInputDevices()
+{
+    QList<QAudioDevice> audioInputDevices = QMediaDevices::audioInputs();
+    for(QAudioDevice &audioInputDevice:audioInputDevices){
+        comboBoxAudioInputDevices->addItem(audioInputDevice.description(),QVariant::fromValue(audioInputDevice));
+    }
+}
+
+void MainWindow::UpdateAudioOutputDevices()
+{
+    QList<QAudioDevice> audioOutputDevices = QMediaDevices::audioOutputs();
+    for(QAudioDevice &audioOutputDevice:audioOutputDevices){
+        comboBoxAudioOutputDevcies->addItem(audioOutputDevice.description(),QVariant::fromValue(audioOutputDevice));
+    }
+}
+
+void MainWindow::UpdateVideoInputDevices()
+{
+    QList<QCameraDevice> cameraDevices = QMediaDevices::videoInputs();
+    for(QCameraDevice &cameraDevice:cameraDevices){
+        comboBoxCameraDevices->addItem(cameraDevice.description(),QVariant::fromValue(cameraDevice));
+    }
 }
