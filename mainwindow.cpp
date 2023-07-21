@@ -12,11 +12,12 @@
 #include <QMessageBox>
 #include <QComboBox>
 #include <QAudioDevice>
+#include <QApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowState(Qt::WindowMaximized);
+    //setWindowState(Qt::WindowMaximized);
 
 
     //main widget
@@ -25,15 +26,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     QHBoxLayout *hboxlayout_main= new QHBoxLayout;
     QVBoxLayout *vboxlayout_media = new QVBoxLayout;
-    QVBoxLayout *vboxlayout_control = new QVBoxLayout;
-    QGridLayout *gradlayout_control = new QGridLayout;
-    vboxlayout_control->addLayout(gradlayout_control);
-    vboxlayout_control->addStretch(0);
-    hboxlayout_main->addLayout(vboxlayout_media,3);
-    hboxlayout_main->addLayout(vboxlayout_control,1);
-    w->setLayout(hboxlayout_main);
+    QVBoxLayout *vboxlayout_setting = new QVBoxLayout;
+    QGroupBox *groupBoxDevices = new QGroupBox(tr("media devices"));
+    QGroupBox *groupBoxCapture = new QGroupBox(tr("capture"));
+    QGroupBox *groupBoxRecorder = new QGroupBox(tr("recorder"));
+    QGroupBox *groupBoxOtherSettings = new QGroupBox(tr("other settings"));
 
-    //control layout
+
+
+    w->setLayout(hboxlayout_main);
+    hboxlayout_main->addLayout(vboxlayout_media,3);
+    hboxlayout_main->addLayout(vboxlayout_setting,1);
+    vboxlayout_setting->addWidget(groupBoxDevices);
+    vboxlayout_setting->addWidget(groupBoxCapture);
+    vboxlayout_setting->addWidget(groupBoxRecorder);
+    vboxlayout_setting->addWidget(groupBoxOtherSettings);
+    vboxlayout_setting->addStretch(0);
+    //vboxlayout_setting->setContentsMargins(10,0,10,0);
+
+
+
+
+    //group devices
+    QGridLayout *gradlayout_devices = new QGridLayout;
+    //gradlayout_devices->setContentsMargins(9,9,10,9);
     labelCameraDevices = new QLabel(tr("cameras devices:"));
     comboBoxCameraDevices = new QComboBox;
     labelAudioInputDevices = new QLabel(tr("audio inputs:"));
@@ -41,19 +57,61 @@ MainWindow::MainWindow(QWidget *parent)
     labelAudioOutputDevcies = new QLabel("audio outputs:");
     comboBoxAudioOutputDevcies = new QComboBox;
 
-    gradlayout_control->addWidget(labelAudioInputDevices,0,0);
-    gradlayout_control->addWidget(comboBoxAudioInputDevices,0,1);
-    gradlayout_control->addWidget(labelAudioOutputDevcies,1,0);
-    gradlayout_control->addWidget(comboBoxAudioOutputDevcies,1,1);
-    gradlayout_control->addWidget(labelCameraDevices,2,0);
-    gradlayout_control->addWidget(comboBoxCameraDevices,2,1);
 
-    UpdateAudioInputDevices();
-    UpdateAudioOutputDevices();
-    UpdateVideoInputDevices();
+    gradlayout_devices->addWidget(labelAudioInputDevices,0,0);
+    gradlayout_devices->addWidget(comboBoxAudioInputDevices,0,1);
+    gradlayout_devices->addWidget(labelAudioOutputDevcies,1,0);
+    gradlayout_devices->addWidget(comboBoxAudioOutputDevcies,1,1);
+    gradlayout_devices->addWidget(labelCameraDevices,2,0);
+    gradlayout_devices->addWidget(comboBoxCameraDevices,2,1);
+    groupBoxDevices->setLayout(gradlayout_devices);
 
 
 
+
+    //connect(comboBoxAudioOutputDevcies,&QComboBox::currentTextChanged,this,&MainWindow::comboBoxAudioOutputDevciesChanged);
+
+    //group capture
+    QGridLayout *gradlayout_capture = new QGridLayout;
+    labelCaptureSavePath = new QLabel("capture path:");
+    lineEditCaptureSavePath = new QLineEdit;
+    buttonChooseCaptureSavePath = new QPushButton(tr("choose..."));
+    captureButton = new QPushButton(tr("capture"));
+
+
+
+
+    gradlayout_capture->addWidget(labelCaptureSavePath,0,0);
+    gradlayout_capture->addWidget(lineEditCaptureSavePath,0,1);
+    gradlayout_capture->addWidget(buttonChooseCaptureSavePath,0,2);
+    gradlayout_capture->addWidget(captureButton,1,0);
+    groupBoxCapture->setLayout(gradlayout_capture);
+
+
+    //group recorder
+    QGridLayout *gradlayout_recorder = new QGridLayout;
+    labelRecorderSavePath = new QLabel("recorder path");
+    lineEditRecorderSavePath = new QLineEdit;
+    buttonChooseRecorderSavePath = new QPushButton(tr("choose..."));
+    startRecordButton = new QPushButton(tr("start"));
+    stopRecordButton = new QPushButton(tr("stop"));
+    pauseRecordButton = new QPushButton(tr("pause"));
+
+
+    gradlayout_recorder->addWidget(labelRecorderSavePath,0,0);
+    gradlayout_recorder->addWidget(lineEditRecorderSavePath,0,1,1,2);
+    gradlayout_recorder->addWidget(buttonChooseRecorderSavePath,0,3);
+    gradlayout_recorder->addWidget(startRecordButton,1,0);
+    gradlayout_recorder->addWidget(pauseRecordButton,1,1);
+    gradlayout_recorder->addWidget(stopRecordButton,1,2);
+    groupBoxRecorder->setLayout(gradlayout_recorder);
+
+    //group other settings
+    QGridLayout *gradlayout_other = new QGridLayout;
+    labelOtherSettings = new QLabel(tr("other settings:"));
+
+    gradlayout_other->addWidget(labelOtherSettings,0,0);
+    groupBoxOtherSettings->setLayout(gradlayout_other);
 
     //media layout
     videoWidget = new QVideoWidget;
@@ -61,23 +119,32 @@ MainWindow::MainWindow(QWidget *parent)
     stackedWidget = new QStackedWidget;
     stackedWidget->insertWidget(0,videoWidget);
     stackedWidget->insertWidget(1,lastImage);
-
-    startRecordButton = new QPushButton(tr("start"));
-    stopRecordButton = new QPushButton(tr("stop"));
-    pauseRecordButton = new QPushButton(tr("pause"));
-    captureButton = new QPushButton(tr("capture"));
-    QHBoxLayout *hboxlayout = new QHBoxLayout;
-    hboxlayout->addStretch();
-    hboxlayout->addWidget(startRecordButton);
-    hboxlayout->addWidget(stopRecordButton);
-    hboxlayout->addWidget(pauseRecordButton);
-    hboxlayout->addWidget(captureButton);
-    hboxlayout->addStretch();
+    stackedWidget->setMinimumWidth(400);
     vboxlayout_media->addWidget(stackedWidget);
-    vboxlayout_media->addLayout(hboxlayout);
 
-    //output
+
+
+
+
+    //devices
+    mediaDevices = new QMediaDevices(this);
+    connect(mediaDevices,&QMediaDevices::audioInputsChanged,this,&MainWindow::UpdateAudioInputDevices);
+    connect(mediaDevices,&QMediaDevices::audioOutputsChanged,this,&MainWindow::UpdateAudioOutputDevices);
+    connect(mediaDevices,&QMediaDevices::videoInputsChanged,this,&MainWindow::UpdateVideoInputDevices);
+
+
+    //session
     session = new QMediaCaptureSession(this);
+
+    //camera
+    camera = new QCamera;//default cameraDevice
+    session->setCamera(camera);
+    connect(camera,&QCamera::errorOccurred,this,&MainWindow::CameraErrorOccurred);
+    connect(camera,&QCamera::activeChanged,this,&MainWindow::CameraActiveChanged);
+    connect(camera,&QCamera::cameraDeviceChanged,this,&MainWindow::CameraDeviceChanged);
+
+
+    //output stream
     session->setVideoOutput(videoWidget);
     audioOutput = new QAudioOutput(QMediaDevices::defaultAudioOutput());
     session->setAudioOutput(audioOutput);
@@ -86,17 +153,19 @@ MainWindow::MainWindow(QWidget *parent)
     mediaRecored = new QMediaRecorder;
     session->setRecorder(mediaRecored);
 
-    //input
-    mediaDevices = new QMediaDevices(this);
+    //input stream
     audioInput = new QAudioInput(mediaDevices->defaultAudioInput());
     session->setAudioInput(audioInput);
-    SetCamera(QMediaDevices::defaultVideoInput());
+
+    UpdateAudioInputDevices();
+    UpdateAudioOutputDevices();
+    UpdateVideoInputDevices();
 
 
 
 
 
-    //camera
+
 
 
     //capture
@@ -123,15 +192,13 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::setCamere_action(QAction *action)
-{
-    SetCamera(qvariant_cast<QCameraDevice>(action->data()));
-}
+
 
 void MainWindow::on_start_record_clicked()
 {
     mediaRecored->record();
     //UpdateRecorederTime();
+    //qDebug()<<mediaRecored->actualLocation();
 }
 
 void MainWindow::on_pause_record_clicked()
@@ -147,6 +214,12 @@ void MainWindow::on_stop_record_clicked()
 void MainWindow::on_capture_image_clicked()
 {
     imageCapture->captureToFile();
+    //QApplication::beep();
+}
+
+void MainWindow::comboBoxAudioOutputDevciesChanged(const QString &audioOutputDevice)
+{
+    qDebug()<<audioOutputDevice;
 }
 
 void MainWindow::UpdateRecorderState(QMediaRecorder::RecorderState state)
@@ -223,43 +296,65 @@ void MainWindow::ReadyForCapture(bool ready)
     captureButton->setEnabled(ready);
 }
 
-void MainWindow::SetCamera(const QCameraDevice &cameraDevice)
+//camera slots
+void MainWindow::CameraErrorOccurred(QCamera::Error error, const QString &errorString)
 {
-    if(cameraDevice.isNull()){
-        qDebug()<<"cameraDevice is Null";
-        return;
-    }
-    if(camera != nullptr){
-        delete camera;
-        camera = nullptr;
-    }
-    camera = new QCamera(cameraDevice);
-    session->setCamera(camera);
-    camera->start();
+    qDebug()<<"cameraError:"<<errorString;
+}
+
+void MainWindow::CameraDeviceChanged()
+{
+    qDebug()<<"cameraDevice changed:"<<camera->cameraDevice().description();
+}
+
+void MainWindow::CameraActiveChanged(bool value)
+{
+    qDebug()<<"CameraActiveChanged:"<<value;
 
 
 }
 
+
+//mediaDevices slots
 void MainWindow::UpdateAudioInputDevices()
 {
+    comboBoxAudioInputDevices->clear();
     QList<QAudioDevice> audioInputDevices = QMediaDevices::audioInputs();
     for(QAudioDevice &audioInputDevice:audioInputDevices){
         comboBoxAudioInputDevices->addItem(audioInputDevice.description(),QVariant::fromValue(audioInputDevice));
     }
+    comboBoxAudioInputDevices->setCurrentText(QMediaDevices::defaultAudioInput().description());
 }
 
 void MainWindow::UpdateAudioOutputDevices()
 {
+    comboBoxAudioOutputDevcies->clear();
     QList<QAudioDevice> audioOutputDevices = QMediaDevices::audioOutputs();
     for(QAudioDevice &audioOutputDevice:audioOutputDevices){
         comboBoxAudioOutputDevcies->addItem(audioOutputDevice.description(),QVariant::fromValue(audioOutputDevice));
     }
+    comboBoxAudioOutputDevcies->setCurrentText(QMediaDevices::defaultAudioOutput().description());
 }
 
 void MainWindow::UpdateVideoInputDevices()
 {
+    comboBoxCameraDevices->clear();
     QList<QCameraDevice> cameraDevices = QMediaDevices::videoInputs();
     for(QCameraDevice &cameraDevice:cameraDevices){
         comboBoxCameraDevices->addItem(cameraDevice.description(),QVariant::fromValue(cameraDevice));
     }
+    comboBoxCameraDevices->setCurrentText(QMediaDevices::defaultVideoInput().description());
+
+
+    camera->setCameraDevice(qvariant_cast<QCameraDevice>(comboBoxCameraDevices->currentData()));
+    qDebug()<<"debug:"<<camera->cameraDevice().description();
+    qDebug()<<camera->isAvailable();
+    if(camera->isAvailable()){
+        camera->start();
+    }
+
+
+
+
+
 }

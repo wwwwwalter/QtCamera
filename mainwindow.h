@@ -20,6 +20,14 @@
 #include <QAudioOutput>
 #include <QImage>
 #include <QComboBox>
+#include <QGroupBox>
+#include <QLineEdit>
+
+#include <iostream>       // std::cout, std::endl
+#include <thread>         // std::this_thread::sleep_for
+#include <chrono>         // std::chrono::seconds
+//std::this_thread::sleep_for(std::chrono::seconds(1));
+
 
 class MainWindow : public QMainWindow
 {
@@ -33,7 +41,15 @@ public:
 
 private:
 
-    //control elements
+    //media elements
+    QStackedWidget *stackedWidget;
+    QLabel *lastImage;
+    //QVideoWidget *videoWidget;
+
+
+
+    //setting elements
+    //group devices
     QLabel *labelCameraDevices;
     QComboBox *comboBoxCameraDevices;
     QLabel *labelAudioInputDevices;
@@ -42,16 +58,24 @@ private:
     QComboBox *comboBoxAudioOutputDevcies;
 
 
+    //group capture
+    QLabel *labelCaptureSavePath;
+    QLineEdit *lineEditCaptureSavePath;
+    QPushButton *buttonChooseCaptureSavePath;
+    QPushButton *captureButton;
 
-    //media elements
+
+    //group recorder
+    QLabel *labelRecorderSavePath;
+    QLineEdit *lineEditRecorderSavePath;
+    QPushButton *buttonChooseRecorderSavePath;
     QPushButton *startRecordButton;
     QPushButton *stopRecordButton;
     QPushButton *pauseRecordButton;
-    QPushButton *captureButton;
 
-    QStackedWidget *stackedWidget;
-    QLabel *lastImage;
-    //QVideoWidget *videoWidget;
+
+    //group other settings
+    QLabel *labelOtherSettings;
 
 
 
@@ -81,14 +105,30 @@ private:
 
 
 private slots:
-    void setCamere_action(QAction *action);
+
+
+
+
+
+
+public slots:
+    //mediaDeives slots
+    void UpdateAudioInputDevices();
+    void UpdateAudioOutputDevices();
+    void UpdateVideoInputDevices();
+
+    //camera slots
+    void CameraErrorOccurred(QCamera::Error error, const QString &errorString);
+    void CameraDeviceChanged();
+    void CameraActiveChanged(bool value);
+
+    //control button slots
     void on_start_record_clicked();
     void on_pause_record_clicked();
     void on_stop_record_clicked();
     void on_capture_image_clicked();
 
-
-public:
+    //
     void UpdateRecorderState(QMediaRecorder::RecorderState state);
     void DisplayCaptureError(int id,const QImageCapture::Error error,const QString &errorString);
     void DisplayRecorderError();
@@ -98,13 +138,14 @@ public:
     void DisplayViewfinder();
     void ProcessCapturedImage(int requestId,const QImage &img);
     void ReadyForCapture(bool ready);
-    void SetCamera(const QCameraDevice &cameraDevice);
 
-    //update devices
-    void UpdateAudioInputDevices();
-    void UpdateAudioOutputDevices();
-    void UpdateVideoInputDevices();
-    void UpdataCameraDevices();
+    //comboBox slots
+    void comboBoxAudioOutputDevciesChanged(const QString &audioOutputDevice);
+
+
+
+
+
 
 
 
