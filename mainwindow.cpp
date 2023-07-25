@@ -13,6 +13,7 @@
 #include <QComboBox>
 #include <QAudioDevice>
 #include <QApplication>
+#include <QStyleFactory>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -123,12 +124,29 @@ MainWindow::MainWindow(QWidget *parent)
     gradlayout_recorder->addWidget(openRecordFolderButton,1,3);
     groupBoxRecorder->setLayout(gradlayout_recorder);
 
-    //group other settings
+    //group camera parameters
     QGridLayout *gradlayout_camereParameters = new QGridLayout;
-    labelParameter = new QLabel(tr("other settings:"));
 
-    gradlayout_camereParameters->addWidget(labelParameter,0,0);
+    stylesLabel = new QLabel(tr("app theme"));
+    stylesComboBox = new QComboBox;
+
+
+
+
+    gradlayout_camereParameters->setColumnStretch(0,1);
+    gradlayout_camereParameters->setColumnStretch(1,1);
+    gradlayout_camereParameters->setColumnStretch(2,1);
+    gradlayout_camereParameters->setColumnStretch(3,1);
+    gradlayout_camereParameters->setColumnStretch(4,1);
+    gradlayout_camereParameters->addWidget(stylesLabel,0,0);
+    gradlayout_camereParameters->addWidget(stylesComboBox,0,1);
     groupBoxCameraParameters->setLayout(gradlayout_camereParameters);
+
+    stylesComboBox->addItems(QStyleFactory::keys());
+    connect(stylesComboBox,&QComboBox::currentTextChanged,this,&MainWindow::UpdateUiStyle);
+
+
+
 
     //media layout
     videoWidget = new QVideoWidget;
@@ -329,6 +347,11 @@ void MainWindow::CameraActiveChanged(bool value)
     qDebug()<<"CameraActiveChanged:"<<value;
 
 
+}
+
+//ui style slots
+void MainWindow::UpdateUiStyle(){
+    QApplication::setStyle(QStyleFactory::create(stylesComboBox->currentText()));
 }
 
 

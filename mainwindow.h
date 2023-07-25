@@ -90,7 +90,8 @@ private:
 
     //group camera parameters
     QGroupBox *groupBoxCameraParameters;
-    QLabel *labelParameter;
+    QLabel *stylesLabel;
+    QComboBox *stylesComboBox;
 
 
 
@@ -119,14 +120,13 @@ private:
 
 
 
-private slots:
-
-
-
 
 
 
 public slots:
+    //ui style slots
+    void UpdateUiStyle();
+
     //mediaDeives slots
     void UpdateAudioInputDevices();
     void UpdateAudioOutputDevices();
