@@ -47,9 +47,19 @@ private:
     //QVideoWidget *videoWidget;
 
 
+    //left widget
+    QWidget *leftWidget;
+
+
+    //right widget
+    QWidget *rightWidget;
+
 
     //setting elements
+
+
     //group devices
+    QGroupBox *groupBoxDevices;
     QLabel *labelCameraDevices;
     QComboBox *comboBoxCameraDevices;
     QLabel *labelAudioInputDevices;
@@ -59,23 +69,28 @@ private:
 
 
     //group capture
+    QGroupBox *groupBoxCapture;
     QLabel *labelCaptureSavePath;
     QLineEdit *lineEditCaptureSavePath;
     QPushButton *buttonChooseCaptureSavePath;
     QPushButton *captureButton;
+    QPushButton *openCaptureFolderButton;
 
 
     //group recorder
+    QGroupBox *groupBoxRecorder;
     QLabel *labelRecorderSavePath;
     QLineEdit *lineEditRecorderSavePath;
     QPushButton *buttonChooseRecorderSavePath;
     QPushButton *startRecordButton;
     QPushButton *stopRecordButton;
     QPushButton *pauseRecordButton;
+    QPushButton *openRecordFolderButton;
 
 
-    //group other settings
-    QLabel *labelOtherSettings;
+    //group camera parameters
+    QGroupBox *groupBoxCameraParameters;
+    QLabel *labelParameter;
 
 
 

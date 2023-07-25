@@ -25,38 +25,49 @@ MainWindow::MainWindow(QWidget *parent)
     //main widget
     QWidget *w = new QWidget;
     setCentralWidget(w);
-
     QHBoxLayout *hboxlayout_main= new QHBoxLayout;
+    w->setLayout(hboxlayout_main);
+
+    leftWidget = new QWidget;
+    rightWidget = new QWidget;
+    rightWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Preferred);
+    hboxlayout_main->addWidget(leftWidget);
+    hboxlayout_main->addWidget(rightWidget);
+
     QVBoxLayout *vboxlayout_media = new QVBoxLayout;
     QVBoxLayout *vboxlayout_setting = new QVBoxLayout;
-    QGroupBox *groupBoxDevices = new QGroupBox(tr("media devices"));
-    QGroupBox *groupBoxCapture = new QGroupBox(tr("capture"));
-    QGroupBox *groupBoxRecorder = new QGroupBox(tr("recorder"));
-    QGroupBox *groupBoxOtherSettings = new QGroupBox(tr("other settings"));
+
+    leftWidget->setLayout(vboxlayout_media);
+    rightWidget->setLayout(vboxlayout_setting);
 
 
 
-    w->setLayout(hboxlayout_main);
+    groupBoxDevices = new QGroupBox(tr("media devices"));
+    groupBoxCapture = new QGroupBox(tr("capture"));
+    groupBoxRecorder = new QGroupBox(tr("recorder"));
+    groupBoxCameraParameters = new QGroupBox(tr("camera parameters"));
+
+
+
+
     hboxlayout_main->addLayout(vboxlayout_media,3);
     hboxlayout_main->addLayout(vboxlayout_setting,1);
     vboxlayout_setting->addWidget(groupBoxDevices);
     vboxlayout_setting->addWidget(groupBoxCapture);
     vboxlayout_setting->addWidget(groupBoxRecorder);
-    vboxlayout_setting->addWidget(groupBoxOtherSettings);
+    vboxlayout_setting->addWidget(groupBoxCameraParameters);
     vboxlayout_setting->addStretch(0);
-    //vboxlayout_setting->setContentsMargins(10,0,10,0);
 
 
 
 
     //group devices
     QGridLayout *gradlayout_devices = new QGridLayout;
-    //gradlayout_devices->setContentsMargins(9,9,10,9);
-    labelCameraDevices = new QLabel(tr("cameras devices:"));
+    labelCameraDevices = new QLabel(tr("cameras devices"));
     comboBoxCameraDevices = new QComboBox;
-    labelAudioInputDevices = new QLabel(tr("audio inputs:"));
+    labelAudioInputDevices = new QLabel(tr("audio inputs"));
     comboBoxAudioInputDevices = new QComboBox;
-    labelAudioOutputDevcies = new QLabel("audio outputs:");
+    labelAudioOutputDevcies = new QLabel("audio outputs");
     comboBoxAudioOutputDevcies = new QComboBox;
 
 
@@ -75,18 +86,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     //group capture
     QGridLayout *gradlayout_capture = new QGridLayout;
-    labelCaptureSavePath = new QLabel("capture path:");
+    labelCaptureSavePath = new QLabel("capture path");
     lineEditCaptureSavePath = new QLineEdit;
     buttonChooseCaptureSavePath = new QPushButton(tr("choose..."));
     captureButton = new QPushButton(tr("capture"));
+    openCaptureFolderButton = new QPushButton(tr("directory"));
 
 
 
 
     gradlayout_capture->addWidget(labelCaptureSavePath,0,0);
-    gradlayout_capture->addWidget(lineEditCaptureSavePath,0,1);
-    gradlayout_capture->addWidget(buttonChooseCaptureSavePath,0,2);
+    gradlayout_capture->addWidget(lineEditCaptureSavePath,0,1,1,3);
+    gradlayout_capture->addWidget(buttonChooseCaptureSavePath,0,4);
     gradlayout_capture->addWidget(captureButton,1,0);
+    gradlayout_capture->addWidget(openCaptureFolderButton,1,1);
     groupBoxCapture->setLayout(gradlayout_capture);
 
 
@@ -98,22 +111,24 @@ MainWindow::MainWindow(QWidget *parent)
     startRecordButton = new QPushButton(tr("start"));
     stopRecordButton = new QPushButton(tr("stop"));
     pauseRecordButton = new QPushButton(tr("pause"));
+    openRecordFolderButton = new QPushButton(tr("directory"));
 
 
     gradlayout_recorder->addWidget(labelRecorderSavePath,0,0);
-    gradlayout_recorder->addWidget(lineEditRecorderSavePath,0,1,1,2);
-    gradlayout_recorder->addWidget(buttonChooseRecorderSavePath,0,3);
+    gradlayout_recorder->addWidget(lineEditRecorderSavePath,0,1,1,3);
+    gradlayout_recorder->addWidget(buttonChooseRecorderSavePath,0,4);
     gradlayout_recorder->addWidget(startRecordButton,1,0);
     gradlayout_recorder->addWidget(pauseRecordButton,1,1);
     gradlayout_recorder->addWidget(stopRecordButton,1,2);
+    gradlayout_recorder->addWidget(openRecordFolderButton,1,3);
     groupBoxRecorder->setLayout(gradlayout_recorder);
 
     //group other settings
-    QGridLayout *gradlayout_other = new QGridLayout;
-    labelOtherSettings = new QLabel(tr("other settings:"));
+    QGridLayout *gradlayout_camereParameters = new QGridLayout;
+    labelParameter = new QLabel(tr("other settings:"));
 
-    gradlayout_other->addWidget(labelOtherSettings,0,0);
-    groupBoxOtherSettings->setLayout(gradlayout_other);
+    gradlayout_camereParameters->addWidget(labelParameter,0,0);
+    groupBoxCameraParameters->setLayout(gradlayout_camereParameters);
 
     //media layout
     videoWidget = new QVideoWidget;
