@@ -53,10 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
     groupBoxCameraParameters = new QGroupBox(tr("camera parameters"));
 
 
-
-
-    hboxlayout_main->addLayout(vboxlayout_media,3);
-    hboxlayout_main->addLayout(vboxlayout_setting,1);
     vboxlayout_setting->addWidget(groupBoxDevices);
     vboxlayout_setting->addWidget(groupBoxCapture);
     vboxlayout_setting->addWidget(groupBoxRecorder);
