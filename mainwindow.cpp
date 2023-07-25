@@ -17,9 +17,9 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    //setWindowState(Qt::WindowMaximized);
     //Mainwindow
-    setWindowIcon(QIcon("D:\\QT\\Garagelab\\untitled28\\picture.png"));
+    //setWindowState(Qt::WindowMaximized);    
+    setWindowIcon(QIcon(":/images/logo2.png"));
 
 
     //main widget
