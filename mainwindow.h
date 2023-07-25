@@ -166,5 +166,11 @@ public slots:
 
 
 
+
+    // QWidget interface
+protected:
+    virtual void mouseDoubleClickEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event);
+    virtual void keyPressEvent(QKeyEvent *event);
 };
 #endif

@@ -14,6 +14,10 @@
 #include <QAudioDevice>
 #include <QApplication>
 #include <QStyleFactory>
+#include <QMouseEvent>
+#include <QPoint>
+#include <QPointF>
+#include <QRect>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -221,6 +225,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(stopRecordButton,&QPushButton::clicked,this,&MainWindow::on_stop_record_clicked);
     connect(captureButton,&QPushButton::clicked,this,&MainWindow::on_capture_image_clicked);
 
+    qDebug()<<videoWidget->geometry();
+
 }
 
 MainWindow::~MainWindow()
@@ -255,6 +261,32 @@ void MainWindow::on_capture_image_clicked()
 void MainWindow::comboBoxAudioOutputDevciesChanged(const QString &audioOutputDevice)
 {
     qDebug()<<audioOutputDevice;
+}
+
+void MainWindow::mouseDoubleClickEvent(QMouseEvent *event)
+{
+    if(videoWidget->geometry().contains(event->position().toPoint())){
+        videoWidget->setParent(this);
+        videoWidget->setFullScreen(true);
+    }
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+
+
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    qDebug()<<event->key();
+    if((event->key()==Qt::Key_Escape||event->key()==Qt::Key_Back)&&isFullScreen()){
+        videoWidget->setFullScreen(false);
+        event->accept();
+    }
+    else{
+        event->ignore();
+    }
 }
 
 void MainWindow::UpdateRecorderState(QMediaRecorder::RecorderState state)
